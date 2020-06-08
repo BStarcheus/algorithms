@@ -1,16 +1,17 @@
+import sys
+
 class Node:
-    def __init__(self, id, cost=1, priority=0, wall=False):
+    def __init__(self, id, cost=1, wall=False):
         """
         Node of a graph
         :param id:       Unique identifier for the Node (immutable obj)
         :param cost:     The cost of going to this Node (used in pathfinding)
-        :param prioirty: Priority of visiting the spot next (pathfinding)
         :param wall:     True if the position is a wall (cannot be occupied).
         """
         self.id = id
         self.cost = cost
-        self.totalCost = None # Total cost on the current path
-        self.priority = priority
+        self.totalCost = sys.maxsize
+        self.priority = sys.maxsize
         self.prevNode = None
         self.wall = wall
         self.adjacent = []
@@ -68,6 +69,8 @@ class Graph:
         
         return [node for node in self.nodes[node_id].adjacent if node.wall == False]
 
+    def __getitem__(self, id):
+        return self.nodes[id]
 
 
 def trace_path(startNode, endNode):
@@ -97,6 +100,8 @@ def trace_path(startNode, endNode):
 
 class GridGraph(Graph):
     def __init__(self, height=20, width=20):
+        self.height = height
+        self.width = width
         adj_list = self.generate_grid(height=height, width=width)
         super().__init__(adj_list)
 

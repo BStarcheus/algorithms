@@ -1,8 +1,8 @@
 try:
-    from .graph import *
+    from .board import *
 except:
     # Running file as __main__
-    from graph import *
+    from board import *
 
 import heapq
 
@@ -19,7 +19,6 @@ def astar(graph, startNode, endNode, heuristic, visual=False):
     :return:          endNode object. If no path to endNode, None
     """
     pq = [] # Priority Queue
-    visited = set()
 
     startNode.totalCost = startNode.cost
     heapq.heappush(pq, startNode)
@@ -27,19 +26,17 @@ def astar(graph, startNode, endNode, heuristic, visual=False):
     while pq:
         current = heapq.heappop(pq)
 
+        if visual:
+            print("Checking Node:", current)
+
         if current.id == endNode.id:
             return current
         
         for neighbor in graph.neighbors(current.id):
             newTotalCost = current.totalCost + neighbor.cost
             
-            if (neighbor.id not in visited or 
-                (neighbor.totalCost is not None and newTotalCost < neighbor.totalCost)):
-                if visual:
-                    print("CurrentNode:", current, "Checking Neighbor:", neighbor)
-
+            if newTotalCost < neighbor.totalCost:
                 neighbor.prevNode = current
-                visited.add(neighbor.id)
                 neighbor.totalCost = newTotalCost 
                 neighbor.priority = newTotalCost + heuristic(neighbor, endNode)
                 heapq.heappush(pq, neighbor)
@@ -66,8 +63,10 @@ def astarPath(graph, startNode, endNode, heuristic, visual=False):
 
 if __name__ == "__main__":
     g = GridGraph(10, 10)
-
-    print(astarPath(g, Node('0,0'), Node('-5,-5'), GridGraph.heuristic, visual=True))
+    print("Starting at 0,0, looking for -5,-5")
+    print(astarPath(g, g['0,0'], Node('-5,-5'), GridGraph.heuristic, visual=True))
     # Empty list
-    print(astarPath(g, Node('0,0'), Node('5,5'), GridGraph.heuristic, visual=True))
-    print(astarPath(g, Node('9,0'), Node('2,9'), GridGraph.heuristic, visual=True))
+
+    b = Board() # Random board
+    print(f"Starting at {b.start}, looking for {b.end}")
+    print(astarPath(b, b[b.start], b[b.end], GridGraph.heuristic, visual=True))

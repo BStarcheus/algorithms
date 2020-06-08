@@ -1,8 +1,8 @@
 try:
-    from .graph import *
+    from .board import *
 except:
     # Running file as __main__
-    from graph import *
+    from board import *
 
 import heapq
 
@@ -17,7 +17,6 @@ def dijkstras(graph, startNode, endNode, visual=False):
     :return:          endNode object. If no path to endNode, None
     """
     pq = [] # Priority Queue
-    visited = set()
 
     startNode.totalCost = startNode.cost
     heapq.heappush(pq, startNode)
@@ -25,20 +24,20 @@ def dijkstras(graph, startNode, endNode, visual=False):
     while pq:
         current = heapq.heappop(pq)
 
+        if visual:
+            print("Checking Node:", current)   
+
         if current.id == endNode.id:
             return current
         
         for neighbor in graph.neighbors(current.id):
             newTotalCost = current.totalCost + neighbor.cost
             
-            if (neighbor.id not in visited or 
-                (neighbor.totalCost is not None and newTotalCost < neighbor.totalCost)):
-                if visual:
-                    print("CurrentNode:", current, "Checking Neighbor:", neighbor)
-
+            if newTotalCost < neighbor.totalCost:
                 neighbor.prevNode = current
-                visited.add(neighbor.id)
                 neighbor.totalCost = newTotalCost
+                # Priority is used for comparison in heapq
+                neighbor.priority = newTotalCost
                 heapq.heappush(pq, neighbor)
 
 
@@ -62,8 +61,8 @@ def dijkstrasPath(graph, startNode, endNode, visual=False):
 
 if __name__ == "__main__":
     g = GridGraph(10, 10)
-
-    print(dijkstrasPath(g, Node('0,0'), Node('-5,-5'), visual=True))
+    print(dijkstrasPath(g, g['0,0'], Node('-5,-5'), visual=True))
     # Empty list
-    print(dijkstrasPath(g, Node('0,0'), Node('5,5'), visual=True))
-    print(dijkstrasPath(g, Node('9,0'), Node('2,9'), visual=True))
+
+    b = Board() # Random board
+    print(dijkstrasPath(b, b[b.start], b[b.end], visual=True))
